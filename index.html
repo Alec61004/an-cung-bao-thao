@@ -3,92 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nơi Riêng Tư Của Bảo Và Thảo❤️</title>
-  <meta name="description" content="Wishlist ăn uống và vui chơi cho hai đứa" />
+  <title>Ăn cùng Bảo - Thảo ❤️</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div class="hearts" aria-hidden="true">
-    <span>❤️</span><span>🍜</span><span>☕</span><span>🎡</span><span>💕</span>
+  <!-- Background Video -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="background.mp4" type="video/mp4">
+    <!-- Nếu không có video, nó sẽ hiện background-color của CSS -->
+  </video>
+
+  <div class="app">
+    <header>
+      <h1>🍕 Ăn cùng Bảo - Thảo ❤️</h1>
+      <p class="sub">Lưu món ngon & quán xinh muốn đi cùng nhau</p>
+      <button id="randomBtn" class="btn btn-random" type="button">🎲 Random</button>
+    </header>
+
+    <form id="addForm" class="add-form">
+      <input id="nameInput" type="text" placeholder="Tên món / quán..." required>
+      <input id="linkInput" type="url" placeholder="Link Google Maps/Facebook...">
+      <button class="btn" type="submit">+ Thêm</button>
+    </form>
+
+    <div id="emptyMsg" class="empty">Chưa có gì — thêm món đầu tiên đi nha 🥰</div>
+    <div id="list" class="list"></div>
   </div>
 
-  <main class="app-shell">
-    <header class="hero">
-      <button id="themeToggle" class="icon-btn" aria-label="Đổi giao diện">🌙</button>
-      <p class="eyebrow">Couple wishlist</p>
-      <h1>Ăn Ngập Mồm Cùng Bảo Và Thảo ❤️</h1>
-      <p class="subtitle">Lưu lại món ngon, quán xinh và những chỗ muốn đi cùng nhau.</p>
-      <div class="sync-row">
-        <span id="syncStatus" class="sync-pill">Đang khởi động...</span>
-        <button id="exportBtn" class="link-btn" type="button">Xuất dữ liệu</button>
+  <dialog id="randomDialog" class="dialog">
+    <div class="dialog-card">
+      <h2>✨ Kèo hôm nay là...</h2>
+      <div id="randomName" class="dialog-name"></div>
+      <a id="randomLink" class="dialog-link" target="_blank" rel="noopener"></a>
+      <div class="dialog-actions">
+        <button id="randomAgain" class="btn" type="button">🔄 Random lại</button>
+        <button id="closeDialog" class="btn btn-ghost" type="button">Đóng</button>
       </div>
-    </header>
-    
-    </section>
-
-    <section class="card form-card">
-      <div class="section-title">
-        <div>
-          <p class="eyebrow">Thêm kèo mới</p>
-          <h2>Hôm nay mình muốn lưu gì?</h2>
-        </div>
-        <button id="randomBtn" class="secondary-btn" type="button">🎲 Random kèo</button>
-      </div>
-
-      <form id="wishlistForm" class="wish-form">
-        <label>
-          Tên món / địa điểm *
-          <input id="itemName" type="text" required placeholder="Ví dụ: Bún bò, cafe rooftop, Đà Lạt..." />
-        </label>
-
-        <label>
-          Loại
-          <select id="itemType">
-            <option value="food">🍜 Món ăn</option>
-            <option value="restaurant">🍽️ Nhà hàng</option>
-            <option value="cafe">☕ Cafe</option>
-            <option value="play">🎡 Vui chơi</option>
-            <option value="movie">🎬 Xem phim</option>
-          </select>
-        </label>
-
-        <label>
-          Địa chỉ / Link
-          <input id="itemLink" type="url" placeholder="Dán link Google Maps, TikTok, Facebook..." />
-        </label>
-
-        <label>
-          Ghi chú
-          <textarea id="itemNote" rows="3" placeholder="Ví dụ: cạo lông nách,khỏi mặc sịp,cười thật ..."></textarea>
-        </label>
-
-        <button class="primary-btn" type="submit">Thêm vào danh sách 💖</button>
-      </form>
-    </section>
-
-    <nav class="filter-bar" aria-label="Bộ lọc">
-      <button class="filter-btn active" data-filter="all">Tất cả</button>
-      <button class="filter-btn" data-filter="food">🍜 Món ăn</button>
-      <button class="filter-btn" data-filter="restaurant">🍽️ Nhà hàng</button>
-      <button class="filter-btn" data-filter="cafe">☕ Cafe</button>
-      <button class="filter-btn" data-filter="play">🎡 Vui chơi</button>
-      <button class="filter-btn" data-filter="done">✅ Đã đi</button>
-    </nav>
-
-    <section id="wishlist" class="wishlist" aria-live="polite"></section>
-    <section id="emptyState" class="empty-state" hidden>
-      <div>🌸</div>
-      <h2>Chưa có kèo nào nha ní </h2>
-      <p>Vợ với cHòn thêm món ăn hoặc địa điểm đầu tiên nha.</p>
-    </section>
-  </main>
-
-  <dialog id="randomDialog" class="random-dialog">
-    <div id="randomContent"></div>
-    <div class="dialog-actions">
-      <button id="randomAgain" class="secondary-btn" type="button">Random lại</button>
-      <button id="closeDialog" class="primary-btn" type="button">Đóng</button>
     </div>
   </dialog>
 
