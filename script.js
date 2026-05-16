@@ -256,13 +256,25 @@ const nowPlaying = document.getElementById('nowPlaying');
 let musicOn = false;
 let playlist = [];
 let chosenTrack = null;
+let playlistLoaded = false;
+let musicLoading = false;
+
+function setMusicUI() {
+  if (!musicToggle) return;
+  musicToggle.textContent = musicOn ? '🔊 Nhạc: Bật' : '🔇 Nhạc: Tắt';
+}
+
+function setNowPlaying(text) {
+  if (!nowPlaying) return;
+  nowPlaying.textContent = text || '';
+}
 
 async function loadPlaylist() {
   try {
-    const res = await fetch('music/playlist.json', { cache: 'no-store' });
+    const res = await fetch('music/playlist.json?ts=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) {
-        console.error('Failed to load playlist.json:', res.status, res.statusText);
-        return [];
+      console.error('Failed to load playlist.json:', res.status, res.statusText);
+      return [];
     }
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -277,39 +289,59 @@ function pickRandomTrack(tracks) {
   if (!pool.length) return null;
   const idx = Math.floor(Math.random() * pool.length);
   const url = pool[idx];
+  const fileName = url.split('/').pop();
+  const decodedFileName = decodeURIComponent(fileName || '');
+  const title = decodedFileName.replace(/\.(mp3|m4a|wav|flac|ogg|aac)$/i, '');
+  return { file: url, title };
+}
 
-  // Extract a simple title from the URL for display
-  const fileName = url.split('/').pop(); // Get "3%20Strikes%20-%20Terror%20Jr.mp3"
-  const decodedFileName = decodeURIComponent(fileName); // Decode to "3 Strikes - Terror Jr.mp3"
-  const title = decodedFileName.replace(/\.mp3$/, ''); // Remove .mp3 extension
+async function ensureTrackReady() {
+  if (chosenTrack && bgMusic.src) return true;
+  if (musicLoading) return false;
 
-  return { file: url, title: title }; // Return an object with file (URL) and extracted title
+  musicLoading = true;
+  if (musicToggle) musicToggle.textContent = '⏳ Đang tải nhạc...';
+  setNowPlaying('⏳ Đang tải danh sách nhạc...');
+
+  if (!playlistLoaded) {
+    playlist = await loadPlaylist();
+    playlistLoaded = true;
+  }
+
+  chosenTrack = pickRandomTrack(playlist);
+  if (!chosenTrack || !chosenTrack.file) {
+    setNowPlaying('Không có nhạc để phát. Kiểm tra music/playlist.json');
+    musicLoading = false;
+    setMusicUI();
+    return false;
+  }
+
+  bgMusic.src = chosenTrack.file;
+  bgMusic.load();
+  setNowPlaying(`🎵 Hôm nay nghe: ${chosenTrack.title}`);
+  musicLoading = false;
+  setMusicUI();
+  return true;
 }
 
 async function initMusic() {
   if (!bgMusic || !musicToggle) return;
 
-  playlist = await loadPlaylist();
-  chosenTrack = pickRandomTrack(playlist);
-
-  if (chosenTrack && chosenTrack.file) { // Check if chosenTrack and its file property exist
-    bgMusic.src = chosenTrack.file;
-    setNowPlaying(`🎵 Đang nghe: ${chosenTrack.title}`);
-  } else {
-    console.warn('Playlist is empty or track selection failed. No background music will play.');
-    setNowPlaying('Không có nhạc để phát.');
-    musicToggle.style.display = 'none'; // Hide the toggle if no music
-  }
-
   setMusicUI();
+  setNowPlaying('Bấm nút nhạc để phát một bài ngẫu nhiên 🎵');
+
+  // Load playlist in background, but do not block the button click.
+  loadPlaylist().then(data => {
+    playlist = data;
+    playlistLoaded = true;
+    if (!playlist.length) setNowPlaying('Không có nhạc để phát. Kiểm tra music/playlist.json');
+  });
 
   musicToggle.addEventListener('click', async () => {
     try {
       if (!musicOn) {
-        if (!bgMusic.src) { // If src is still empty, something went wrong
-            alert('Không có nhạc để phát. Vui lòng kiểm tra playlist.');
-            return;
-        }
+        const ready = await ensureTrackReady();
+        if (!ready) return;
         await bgMusic.play();
         musicOn = true;
       } else {
@@ -318,12 +350,9 @@ async function initMusic() {
       }
       setMusicUI();
     } catch (e) {
-      console.warn('Autoplay blocked or file missing/error during playback:', e);
-      if (!bgMusic.src) {
-        alert('Không có nhạc để phát. Vui lòng kiểm tra playlist và file nhạc.');
-      } else {
-        alert('Trình duyệt chặn tự động phát nhạc. Vui lòng bấm nút play/pause để bắt đầu.');
-      }
+      console.warn('Music playback failed:', e);
+      setMusicUI();
+      alert('Chưa phát được nhạc. Nếu file hơi nặng, chờ vài giây rồi bấm lại. Nếu vẫn lỗi, gửi Alec ảnh Console nhé.');
     }
   });
 }
