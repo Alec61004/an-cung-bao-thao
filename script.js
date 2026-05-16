@@ -324,36 +324,59 @@ async function ensureTrackReady() {
   return true;
 }
 
+async function startPlayback() {
+  try {
+    const ready = await ensureTrackReady();
+    if (!ready) return;
+    await bgMusic.play();
+    musicOn = true;
+    setMusicUI();
+  } catch (e) {
+    console.warn('Autoplay failed, waiting for user gesture:', e);
+  }
+}
+
 async function initMusic() {
   if (!bgMusic || !musicToggle) return;
 
   setMusicUI();
-  setNowPlaying('Bấm nút nhạc để phát một bài ngẫu nhiên 🎵');
+  setNowPlaying('Đang chuẩn bị nhạc cho bạn... 🎵');
 
-  // Load playlist in background, but do not block the button click.
+  // Pre-load playlist
   loadPlaylist().then(data => {
     playlist = data;
     playlistLoaded = true;
     if (!playlist.length) setNowPlaying('Không có nhạc để phát. Kiểm tra music/playlist.json');
   });
 
-  musicToggle.addEventListener('click', async () => {
-    try {
-      if (!musicOn) {
-        const ready = await ensureTrackReady();
-        if (!ready) return;
-        await bgMusic.play();
-        musicOn = true;
-      } else {
-        bgMusic.pause();
-        musicOn = false;
-      }
-      setMusicUI();
-    } catch (e) {
-      console.warn('Music playback failed:', e);
-      setMusicUI();
-      alert('Chưa phát được nhạc. Nếu file hơi nặng, chờ vài giây rồi bấm lại. Nếu vẫn lỗi, gửi Alec ảnh Console nhé.');
+  // 1. Try to autoplay immediately (might fail due to browser policy)
+  startPlayback();
+
+  // 2. Auto-play on first user interaction (the "secret" to autoplay)
+  const autoPlayOnce = async () => {
+    if (!musicOn) {
+      await startPlayback();
     }
+    // Remove listener after first successful trigger
+    document.removeEventListener('click', autoPlayOnce);
+    document.removeEventListener('touchstart', autoPlayOnce);
+    document.removeEventListener('scroll', autoPlayOnce);
+  };
+
+  document.addEventListener('click', autoPlayOnce);
+  document.addEventListener('touchstart', autoPlayOnce);
+  document.addEventListener('scroll', autoPlayOnce);
+
+  // Manual toggle button still works
+  musicToggle.addEventListener('click', async () => {
+    if (!musicOn) {
+      await startPlayback();
+      musicOn = true;
+    } else {
+      bgMusic.pause();
+      musicOn = false;
+    }
+    setMusicUI();
   });
 }
 
