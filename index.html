@@ -11,6 +11,8 @@
   <header>
     <h1>🍕 Ăn cùng Bảo - Thảo ❤️</h1>
     <p class="sub">Lưu món ngon & quán xinh muốn đi cùng nhau</p>
+
+    <button id="randomBtn" class="btn btn-random" type="button">🎲 Random</button>
   </header>
 
   <form id="addForm" class="add-form">
@@ -22,6 +24,19 @@
   <div id="emptyMsg" class="empty">Chưa có gì — thêm món đầu tiên đi nha 🥰</div>
   <div id="list" class="list"></div>
 </div>
+
+<dialog id="randomDialog" class="dialog">
+  <div class="dialog-card">
+    <h2>✨ Kèo hôm nay là...</h2>
+    <div id="randomName" class="dialog-name"></div>
+    <a id="randomLink" class="dialog-link" target="_blank" rel="noopener"></a>
+    <div class="dialog-actions">
+      <button id="randomAgain" class="btn" type="button">🔄 Random lại</button>
+      <button id="closeDialog" class="btn btn-ghost" type="button">Đóng</button>
+    </div>
+  </div>
+</dialog>
+
 <script src="script.js"></script>
 </body>
 </html>

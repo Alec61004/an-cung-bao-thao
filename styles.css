@@ -10,7 +10,7 @@ body {
 
 .app { max-width: 600px; margin: 0 auto; }
 
-header { text-align: center; margin-bottom: 24px; }
+header { text-align: center; margin-bottom: 18px; }
 
 h1 { font-size: 1.8rem; color: #d63384; }
 
@@ -40,7 +40,7 @@ h1 { font-size: 1.8rem; color: #d63384; }
 }
 
 .btn {
-  padding: 12px 24px;
+  padding: 12px 18px;
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, #d63384, #c2185b);
@@ -52,6 +52,17 @@ h1 { font-size: 1.8rem; color: #d63384; }
 }
 
 .btn:hover { transform: scale(1.03); }
+
+.btn-ghost {
+  background: transparent;
+  color: #d63384;
+  border: 2px solid #f0ceda;
+}
+
+.btn-random {
+  margin-top: 12px;
+  width: 100%;
+}
 
 .empty {
   text-align: center;
@@ -103,3 +114,53 @@ h1 { font-size: 1.8rem; color: #d63384; }
 }
 
 .del:hover { background: #fce4ec; }
+
+/* Dialog */
+.dialog::backdrop {
+  background: rgba(0,0,0,0.55);
+}
+
+.dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.dialog-card {
+  width: min(520px, calc(100vw - 32px));
+  border-radius: 16px;
+  border: 1px solid #f0ceda;
+  background: rgba(255,255,255,0.95);
+  padding: 18px;
+}
+
+.dialog-card h2 {
+  color: #d63384;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.dialog-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.dialog-link {
+  display: block;
+  text-align: center;
+  color: #d63384;
+  text-decoration: none;
+  margin-bottom: 14px;
+  word-break: break-all;
+}
+
+.dialog-link:hover { text-decoration: underline; }
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.dialog-actions .btn { flex: 1; }

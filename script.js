@@ -43,6 +43,36 @@ function esc(s) {
   }[c]));
 }
 
+// ===== Random =====
+function pickRandom() {
+  if (items.length === 0) {
+    alert('Chưa có món nào để random 😅');
+    return;
+  }
+  const item = items[Math.floor(Math.random() * items.length)];
+
+  const dialog = document.getElementById('randomDialog');
+  const nameEl = document.getElementById('randomName');
+  const linkEl = document.getElementById('randomLink');
+
+  nameEl.textContent = item.name;
+  if (item.link) {
+    linkEl.style.display = 'block';
+    linkEl.href = item.link;
+    linkEl.textContent = 'Mở link / Maps ↗';
+  } else {
+    linkEl.style.display = 'none';
+  }
+
+  dialog.showModal();
+}
+
+document.getElementById('randomBtn').addEventListener('click', pickRandom);
+document.getElementById('randomAgain').addEventListener('click', pickRandom);
+document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('randomDialog').close());
+
+// Add form
+
 document.getElementById('addForm').addEventListener('submit', e => {
   e.preventDefault();
   const name = document.getElementById('nameInput').value.trim();
