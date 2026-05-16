@@ -1,69 +1,68 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Góc Riêng Tư Của Bảo Và Thảo ❤️</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body class="p-4 md:p-8">
-  <video autoplay muted loop playsinline id="bg-video">
-    <source src="background.mp4" type="video/mp4">
-  </video>
-
-  <div class="max-w-2xl mx-auto relative z-10">
-    <header class="text-center mb-10">
-      <h1 class="text-4xl font-bold text-pink-600 mb-2">❤️ Điều Thầm Kín Của Vợ Thảo và Chòn Bảo  ❤️</h1>
-      <p class="text-gray-600 italic">Nơi lưu giữ những khoái cảm tột đỉnh </p>
-      <div class="random-group mt-4">
-        <button id="randomEatBtn" class="px-4 py-2 bg-pink-500 text-white rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg">🍽️ Random ăn uống</button>
-        <button id="randomCafeBtn" class="px-4 py-2 bg-pink-400 text-white rounded-full font-bold hover:bg-pink-500 transition-all shadow-lg">☕ Random cafe</button>
-        <button id="randomPlayBtn" class="px-4 py-2 bg-pink-300 text-white rounded-full font-bold hover:bg-pink-400 transition-all shadow-lg">🎡 Random đi chơi</button>
-        <button id="musicToggle" class="px-4 py-2 bg-white/70 text-pink-600 rounded-full font-bold hover:bg-white transition-all shadow-lg">🔊 Nhạc: Tắt</button>
-      </div>
-
-      <audio id="bgMusic" loop preload="auto"></audio>
-      <div id="nowPlaying" class="mt-2 text-sm text-gray-500 italic"></div>
-    </header>
-
-    <div class="glass-card p-6 mb-8 shadow-xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" id="itemName" placeholder="Tên món ăn..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all">
-        <select id="itemCategory" class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all">
-          <option value="food">🍔 Món ăn yêu thích</option>
-          <option value="cafe">☕ Quán cafe chill</option>
-          <option value="play">🎡 Địa điểm vui chơi</option>
-        </select>
-        <input type="text" id="itemLink" placeholder="Link Maps/Facebook..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
-        <input type="text" id="itemNote" placeholder="Ghi chú..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
-        <button onclick="addItem()" class="btn-gradient text-white font-bold p-3 rounded-xl md:col-span-2 uppercase tracking-wider">Thêm vào danh sách ✨</button>
-      </div>
-    </div>
-
-    <div class="flex justify-center gap-2 mb-6 overflow-x-auto pb-2">
-      <button onclick="filterItems('all')" class="filter-btn active">Tất cả</button>
-      <button onclick="filterItems('food')" class="filter-btn">🍔 Món ăn</button>
-      <button onclick="filterItems('cafe')" class="filter-btn">☕ Nước uống</button>
-      <button onclick="filterItems('play')" class="filter-btn">🎡 Đi chơi</button>
-    </div>
-
-    <div id="wishlist" class="grid grid-cols-1 gap-4"></div>
-  </div>
-
-  <dialog id="randomDialog" class="random-dialog">
-    <div class="dialog-card">
-      <h2>✨ Kèo hôm nay là...</h2>
-      <div id="randomName" class="dialog-name"></div>
-      <a id="randomLink" class="dialog-link" target="_blank" rel="noopener"></a>
-      <div class="dialog-actions">
-        <button id="randomAgain" class="btn-gradient text-white font-bold p-3 rounded-xl flex-1">🔄 Random lại</button>
-        <button id="closeDialog" class="btn-ghost p-3 rounded-xl flex-1">Đóng</button>
-      </div>
-    </div>
-  </dialog>
-
-  <script src="script.js"></script>
-</body>
-</html>
+     1|<!DOCTYPE html>
+     2|<html lang="vi">
+     3|<head>
+     4|  <meta charset="UTF-8" />
+     5|  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     6|  <title>Góc Riêng Tư Của Bảo Và Thảo ❤️</title>
+     7|  <script src="https://cdn.tailwindcss.com"></script>
+     8|  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+     9|  <link rel="stylesheet" href="styles.css">
+    10|</head>
+    11|<body class="p-4 md:p-8">
+    12|  <video autoplay muted loop playsinline id="bg-video">
+    13|    <source src="background.mp4" type="video/mp4">
+    14|  </video>
+    15|
+    16|  <div class="max-w-2xl mx-auto relative z-10">
+    17|    <header class="text-center mb-10">
+    18|      <h1 class="text-4xl font-bold text-pink-600 mb-2">❤️ Điều Thầm Kín Của Vợ Thảo và Chòn Bảo  ❤️</h1>
+    19|      <p class="text-gray-600 italic">Nơi lưu giữ những khoái cảm tột đỉnh </p>
+    20|      <div class="random-group mt-4">
+    21|        <button id="randomEatBtn" class="px-4 py-2 bg-pink-500 text-white rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg">🍽️ Random ăn uống</button>
+    22|        <button id="randomCafeBtn" class="px-4 py-2 bg-pink-400 text-white rounded-full font-bold hover:bg-pink-500 transition-all shadow-lg">☕ Random cafe</button>
+    23|        <button id="randomPlayBtn" class="px-4 py-2 bg-pink-300 text-white rounded-full font-bold hover:bg-pink-400 transition-all shadow-lg">🎡 Random đi chơi</button>
+    25|      </div>
+    26|
+    27|      <audio id="bgMusic" loop preload="auto"></audio>
+    29|    </header>
+    30|
+    31|    <div class="glass-card p-6 mb-8 shadow-xl">
+    32|      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    33|        <input type="text" id="itemName" placeholder="Tên món ăn..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all">
+    34|        <select id="itemCategory" class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all">
+    35|          <option value="food">🍔 Món ăn yêu thích</option>
+    36|          <option value="cafe">☕ Quán cafe chill</option>
+    37|          <option value="play">🎡 Địa điểm vui chơi</option>
+    38|        </select>
+    39|        <input type="text" id="itemLink" placeholder="Link Maps/Facebook..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
+    40|        <input type="text" id="itemNote" placeholder="Ghi chú..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
+    41|        <button onclick="addItem()" class="btn-gradient text-white font-bold p-3 rounded-xl md:col-span-2 uppercase tracking-wider">Thêm vào danh sách ✨</button>
+    42|      </div>
+    43|    </div>
+    44|
+    45|    <div class="flex justify-center gap-2 mb-6 overflow-x-auto pb-2">
+    46|      <button onclick="filterItems('all')" class="filter-btn active">Tất cả</button>
+    47|      <button onclick="filterItems('food')" class="filter-btn">🍔 Món ăn</button>
+    48|      <button onclick="filterItems('cafe')" class="filter-btn">☕ Nước uống</button>
+    49|      <button onclick="filterItems('play')" class="filter-btn">🎡 Đi chơi</button>
+    50|    </div>
+    51|
+    52|    <div id="wishlist" class="grid grid-cols-1 gap-4"></div>
+    53|  </div>
+    54|
+    55|  <dialog id="randomDialog" class="random-dialog">
+    56|    <div class="dialog-card">
+    57|      <h2>✨ Kèo hôm nay là...</h2>
+    58|      <div id="randomName" class="dialog-name"></div>
+    59|      <a id="randomLink" class="dialog-link" target="_blank" rel="noopener"></a>
+    60|      <div class="dialog-actions">
+    61|        <button id="randomAgain" class="btn-gradient text-white font-bold p-3 rounded-xl flex-1">🔄 Random lại</button>
+    62|        <button id="closeDialog" class="btn-ghost p-3 rounded-xl flex-1">Đóng</button>
+    63|      </div>
+    64|    </div>
+    65|  </dialog>
+    66|
+    67|  <script src="script.js"></script>
+    68|</body>
+    69|</html>
+    70|

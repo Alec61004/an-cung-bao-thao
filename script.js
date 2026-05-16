@@ -251,35 +251,18 @@ document.getElementById('closeDialog').addEventListener('click', () => document.
 
 // Background music playlist (random one each page load)
 const bgMusic = document.getElementById('bgMusic');
-const musicToggle = document.getElementById('musicToggle');
-const nowPlaying = document.getElementById('nowPlaying');
-let musicOn = false;
 let playlist = [];
 let chosenTrack = null;
 let playlistLoaded = false;
 let musicLoading = false;
 
-function setMusicUI() {
-  if (!musicToggle) return;
-  musicToggle.textContent = musicOn ? '🔊 Nhạc: Bật' : '🔇 Nhạc: Tắt';
-}
-
-function setNowPlaying(text) {
-  if (!nowPlaying) return;
-  nowPlaying.textContent = text || '';
-}
-
 async function loadPlaylist() {
   try {
     const res = await fetch('music/playlist.json?ts=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) {
-      console.error('Failed to load playlist.json:', res.status, res.statusText);
-      return [];
-    }
+    if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   } catch (e) {
-    console.error('Error loading or parsing playlist.json:', e);
     return [];
   }
 }
@@ -289,10 +272,7 @@ function pickRandomTrack(tracks) {
   if (!pool.length) return null;
   const idx = Math.floor(Math.random() * pool.length);
   const url = pool[idx];
-  const fileName = url.split('/').pop();
-  const decodedFileName = decodeURIComponent(fileName || '');
-  const title = decodedFileName.replace(/\.(mp3|m4a|wav|flac|ogg|aac)$/i, '');
-  return { file: url, title };
+  return { file: url };
 }
 
 async function ensureTrackReady() {
@@ -300,9 +280,6 @@ async function ensureTrackReady() {
   if (musicLoading) return false;
 
   musicLoading = true;
-  if (musicToggle) musicToggle.textContent = '⏳ Đang tải nhạc...';
-  setNowPlaying('⏳ Đang tải danh sách nhạc...');
-
   if (!playlistLoaded) {
     playlist = await loadPlaylist();
     playlistLoaded = true;
@@ -310,17 +287,13 @@ async function ensureTrackReady() {
 
   chosenTrack = pickRandomTrack(playlist);
   if (!chosenTrack || !chosenTrack.file) {
-    setNowPlaying('Không có nhạc để phát. Kiểm tra music/playlist.json');
     musicLoading = false;
-    setMusicUI();
     return false;
   }
 
   bgMusic.src = chosenTrack.file;
   bgMusic.load();
-  setNowPlaying(`🎵 Hôm nay nghe: ${chosenTrack.title}`);
   musicLoading = false;
-  setMusicUI();
   return true;
 }
 
@@ -329,35 +302,26 @@ async function startPlayback() {
     const ready = await ensureTrackReady();
     if (!ready) return;
     await bgMusic.play();
-    musicOn = true;
-    setMusicUI();
   } catch (e) {
-    console.warn('Autoplay failed, waiting for user gesture:', e);
+    console.warn('Autoplay failed:', e);
   }
 }
 
 async function initMusic() {
-  if (!bgMusic || !musicToggle) return;
-
-  setMusicUI();
-  setNowPlaying('Đang chuẩn bị nhạc cho bạn... 🎵');
+  if (!bgMusic) return;
 
   // Pre-load playlist
   loadPlaylist().then(data => {
     playlist = data;
     playlistLoaded = true;
-    if (!playlist.length) setNowPlaying('Không có nhạc để phát. Kiểm tra music/playlist.json');
   });
 
-  // 1. Try to autoplay immediately (might fail due to browser policy)
+  // Try to autoplay immediately
   startPlayback();
 
-  // 2. Auto-play on first user interaction (the "secret" to autoplay)
+  // Auto-play on first user interaction
   const autoPlayOnce = async () => {
-    if (!musicOn) {
-      await startPlayback();
-    }
-    // Remove listener after first successful trigger
+    await startPlayback();
     document.removeEventListener('click', autoPlayOnce);
     document.removeEventListener('touchstart', autoPlayOnce);
     document.removeEventListener('scroll', autoPlayOnce);
@@ -366,18 +330,6 @@ async function initMusic() {
   document.addEventListener('click', autoPlayOnce);
   document.addEventListener('touchstart', autoPlayOnce);
   document.addEventListener('scroll', autoPlayOnce);
-
-  // Manual toggle button still works
-  musicToggle.addEventListener('click', async () => {
-    if (!musicOn) {
-      await startPlayback();
-      musicOn = true;
-    } else {
-      bgMusic.pause();
-      musicOn = false;
-    }
-    setMusicUI();
-  });
 }
 
 initMusic();
