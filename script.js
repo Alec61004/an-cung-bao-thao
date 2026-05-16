@@ -1,11 +1,14 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbyvfUtPXq3OyZPrwSU5IXyFaYPuNOygsZIw3ngXgzegNK0WCEG5vCompVILov7oxWnGNg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyOtyCH9vAPJvdJLijHvzRYgjmF70X9ZLkmBrbBx_FN2QMDGH7iKD-osYGCHfqmeOmJ3A/exec';
 let items = [];
 let currentFilter = 'all';
 
 async function loadItems() {
   try {
     const response = await fetch(API_URL);
-    items = await response.json();
+    items = (await response.json()).map(item => {
+      if (!item.category && !item.type) item.category = 'food';
+      return item;
+    });
     renderItems(currentFilter);
   } catch (error) {
     console.error('Error loading items:', error);
