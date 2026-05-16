@@ -251,4 +251,33 @@ document.getElementById('randomPlayBtn').addEventListener('click', () => pickRan
 document.getElementById('randomAgain').addEventListener('click', () => pickRandom(currentFilter === 'all' ? null : currentFilter));
 document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('randomDialog').close());
 
+// Background music (GitHub Pages: user must click to play)
+const bgMusic = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
+let musicOn = false;
+
+function setMusicUI() {
+  if (!musicToggle) return;
+  musicToggle.textContent = musicOn ? '🔊 Nhạc: Bật' : '🔇 Nhạc: Tắt';
+}
+
+if (musicToggle && bgMusic) {
+  setMusicUI();
+  musicToggle.addEventListener('click', async () => {
+    try {
+      if (!musicOn) {
+        await bgMusic.play();
+        musicOn = true;
+      } else {
+        bgMusic.pause();
+        musicOn = false;
+      }
+      setMusicUI();
+    } catch (e) {
+      console.log('Autoplay blocked until user gesture or file missing:', e);
+      alert('Không phát được nhạc. Kiểm tra file background.mp3 đã upload chưa nhé.');
+    }
+  });
+}
+
 loadItems();
