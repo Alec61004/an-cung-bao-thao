@@ -107,35 +107,73 @@ function buildImageKeyword(item) {
   const rawName = removeVietnameseTones(String(item.name || '').toLowerCase());
   const category = item.category || item.type || 'food';
 
+  // Ưu tiên món Việt để ảnh đúng ngữ cảnh hơn
   const known = [
-    ['banh trang', 'vietnamese rice paper snack'],
-    ['tra sua', 'bubble tea'],
-    ['milk tea', 'bubble tea'],
-    ['cafe', 'coffee shop'],
-    ['ca phe', 'coffee shop'],
-    ['coffee', 'coffee shop'],
+    // Drinks / cafe
+    ['tra sua', 'vietnamese bubble tea'],
+    ['milk tea', 'vietnamese bubble tea'],
+    ['ca phe sua da', 'vietnamese iced coffee'],
+    ['bac xiu', 'vietnamese coffee milk'],
+    ['ca phe', 'vietnamese coffee'],
+    ['cafe', 'vietnamese coffee'],
+    ['coffee', 'coffee shop drink'],
+    ['matcha', 'matcha latte'],
+    ['nuoc ep', 'fresh fruit juice'],
+    ['sinh to', 'vietnamese fruit smoothie'],
+
+    // Popular Vietnamese dishes
+    ['pho bo', 'pho bo vietnamese noodle soup'],
+    ['pho ga', 'pho ga vietnamese noodle soup'],
     ['pho', 'vietnamese pho noodle soup'],
+    ['bun bo hue', 'bun bo hue vietnamese noodle soup'],
     ['bun bo', 'vietnamese beef noodle soup'],
-    ['bun dau', 'vietnamese food'],
-    ['com tam', 'vietnamese broken rice'],
-    ['lau', 'hot pot'],
+    ['bun dau', 'bun dau mam tom vietnamese food'],
+    ['bun cha', 'bun cha hanoi vietnamese food'],
+    ['hu tieu', 'hu tieu vietnamese noodle soup'],
+    ['mi quang', 'mi quang vietnamese noodle'],
+    ['banh canh', 'banh canh vietnamese noodle soup'],
+    ['com tam', 'com tam vietnamese broken rice'],
+    ['com ga', 'vietnamese chicken rice'],
+    ['com chien', 'vietnamese fried rice'],
+    ['banh mi', 'banh mi vietnamese sandwich'],
+    ['goi cuon', 'vietnamese fresh spring rolls'],
+    ['cha gio', 'vietnamese fried spring rolls'],
+    ['nem nuong', 'vietnamese grilled pork rolls'],
+    ['banh xeo', 'banh xeo vietnamese pancake'],
+    ['banh khot', 'banh khot vietnamese mini pancake'],
+    ['banh trang tron', 'banh trang tron vietnamese snack'],
+    ['banh trang', 'vietnamese rice paper snack'],
+    ['lau thai', 'thai hot pot'],
+    ['lau', 'vietnamese hot pot'],
+    ['oc', 'vietnamese seafood snails'],
+    ['hai san', 'vietnamese seafood'],
+    ['do nuong', 'vietnamese bbq grill'],
+    ['thit nuong', 'vietnamese grilled pork'],
+    ['ga ran', 'fried chicken'],
     ['pizza', 'pizza'],
     ['burger', 'burger'],
     ['sushi', 'sushi'],
     ['kem', 'ice cream'],
-    ['banh mi', 'vietnamese sandwich'],
+    ['che', 'vietnamese sweet dessert']
   ];
 
   const match = known.find(([key]) => rawName.includes(key));
   if (match) return match[1];
 
+  // Heuristic theo từ khóa tiếng Việt
+  const drinkHints = ['tra', 'sua', 'nuoc', 'ep', 'smoothie', 'latte', 'mojito', 'soda'];
+  if (drinkHints.some(h => rawName.includes(h))) return 'vietnamese drink';
+
+  const placeHints = ['quan', 'nha hang', 'restaurant', 'cafe', 'coffee'];
+  if (placeHints.some(h => rawName.includes(h))) return 'vietnamese restaurant';
+
   const fallback = {
-    food: 'vietnamese food',
-    cafe: 'coffee shop',
-    play: 'fun place',
-    travel: 'romantic travel'
+    food: 'vietnamese street food',
+    cafe: 'vietnamese coffee shop',
+    play: 'vietnam city entertainment',
+    travel: 'vietnam travel destination'
   };
-  return fallback[category] || 'food';
+  return fallback[category] || 'vietnamese food';
 }
 
 function removeVietnameseTones(str) {
