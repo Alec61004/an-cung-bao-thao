@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Góc nhỏ của tụi mình ❤️</title>
+  <title>ĂN nGẬp mỒM cùng Bảo và Thảo❤️</title>
   <meta name="description" content="Wishlist ăn uống và vui chơi cho hai đứa" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,12 +24,7 @@
         <button id="exportBtn" class="link-btn" type="button">Xuất dữ liệu</button>
       </div>
     </header>
-
-    <section class="stats-grid" aria-label="Thống kê">
-      <article class="stat-card"><strong id="totalCount">0</strong><span>Tất cả</span></article>
-      <article class="stat-card"><strong id="todoCount">0</strong><span>Muốn thử</span></article>
-      <article class="stat-card"><strong id="plannedCount">0</strong><span>Đã lên kèo</span></article>
-      <article class="stat-card"><strong id="doneCount">0</strong><span>Đã đi</span></article>
+    
     </section>
 
     <section class="card form-card">
@@ -55,8 +50,6 @@
             <option value="cafe">☕ Cafe</option>
             <option value="play">🎡 Vui chơi</option>
             <option value="movie">🎬 Xem phim</option>
-            <option value="travel">✈️ Du lịch</option>
-            <option value="other">💭 Khác</option>
           </select>
         </label>
 
@@ -67,7 +60,7 @@
 
         <label>
           Ghi chú
-          <textarea id="itemNote" rows="3" placeholder="Ví dụ: Đi buổi tối chắc đẹp, em thích món này, nhớ đặt bàn trước..."></textarea>
+          <textarea id="itemNote" rows="3" placeholder="Ví dụ: cạo lông nách,khỏi mặc sịp,cười thật ..."></textarea>
         </label>
 
         <button class="primary-btn" type="submit">Thêm vào danh sách 💖</button>
@@ -80,15 +73,14 @@
       <button class="filter-btn" data-filter="restaurant">🍽️ Nhà hàng</button>
       <button class="filter-btn" data-filter="cafe">☕ Cafe</button>
       <button class="filter-btn" data-filter="play">🎡 Vui chơi</button>
-      <button class="filter-btn" data-filter="travel">✈️ Du lịch</button>
       <button class="filter-btn" data-filter="done">✅ Đã đi</button>
     </nav>
 
     <section id="wishlist" class="wishlist" aria-live="polite"></section>
     <section id="emptyState" class="empty-state" hidden>
       <div>🌸</div>
-      <h2>Chưa có kèo nào ở đây</h2>
-      <p>Hai đứa thêm món ăn hoặc địa điểm đầu tiên nha.</p>
+      <h2>Chưa có kèo nào nha ní </h2>
+      <p>Vợ với cHòn thêm món ăn hoặc địa điểm đầu tiên nha.</p>
     </section>
   </main>
 
