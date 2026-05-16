@@ -3,39 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ăn cùng Bảo - Thảo ❤️</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Góc Nhỏ Của Chúng Mình ❤️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="p-4 md:p-8">
   <video autoplay muted loop playsinline id="bg-video">
     <source src="background.mp4" type="video/mp4">
   </video>
 
-  <div class="app">
-    <header>
-      <h1>🍕 Ăn cùng Bảo - Thảo ❤️</h1>
-      <p class="sub">Lưu món ngon & quán xinh muốn đi cùng nhau</p>
-      <button id="randomBtn" class="btn btn-random" type="button">🎲 Random</button>
+  <div class="max-w-2xl mx-auto relative z-10">
+    <header class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-pink-600 mb-2">❤️ Góc Nhỏ Của Chúng Mình ❤️</h1>
+      <p class="text-gray-600 italic">Nơi lưu giữ những điều ngọt ngào và những món ngon sắp thử!</p>
+      <button id="randomBtn" class="mt-4 px-6 py-2 bg-pink-500 text-white rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg">🎲 Random kèo</button>
     </header>
 
-    <form id="addForm" class="add-form">
-      <input id="nameInput" type="text" placeholder="Tên món / quán..." required>
-      <input id="linkInput" type="url" placeholder="Link Google Maps/Facebook...">
-      <button class="btn" type="submit">+ Thêm</button>
-    </form>
+    <div class="glass-card p-6 mb-8 shadow-xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" id="itemName" placeholder="Tên món ăn/địa điểm..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all">
+        <select id="itemCategory" class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all">
+          <option value="food">🍔 Món ăn yêu thích</option>
+          <option value="cafe">☕ Quán cafe chill</option>
+          <option value="play">🎡 Địa điểm vui chơi</option>
+          <option value="travel">✈️ Nơi muốn đi cùng nhau</option>
+        </select>
+        <input type="text" id="itemLink" placeholder="Link Maps/Facebook..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
+        <input type="text" id="itemNote" placeholder="Ghi chú..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
+        <button onclick="addItem()" class="btn-gradient text-white font-bold p-3 rounded-xl md:col-span-2 uppercase tracking-wider">Thêm vào danh sách ✨</button>
+      </div>
+    </div>
 
-    <div id="emptyMsg" class="empty">Chưa có gì — thêm món đầu tiên đi nha 🥰</div>
-    <div id="list" class="list"></div>
+    <div class="flex justify-center gap-2 mb-6 overflow-x-auto pb-2">
+      <button onclick="filterItems('all')" class="filter-btn active">Tất cả</button>
+      <button onclick="filterItems('food')" class="filter-btn">🍔 Món ăn</button>
+      <button onclick="filterItems('cafe')" class="filter-btn">☕ Cafe</button>
+      <button onclick="filterItems('play')" class="filter-btn">🎡 Vui chơi</button>
+      <button onclick="filterItems('travel')" class="filter-btn">✈️ Du lịch</button>
+    </div>
+
+    <div id="wishlist" class="grid grid-cols-1 gap-4"></div>
   </div>
 
-  <dialog id="randomDialog" class="dialog">
+  <dialog id="randomDialog" class="random-dialog">
     <div class="dialog-card">
       <h2>✨ Kèo hôm nay là...</h2>
       <div id="randomName" class="dialog-name"></div>
       <a id="randomLink" class="dialog-link" target="_blank" rel="noopener"></a>
       <div class="dialog-actions">
-        <button id="randomAgain" class="btn" type="button">🔄 Random lại</button>
-        <button id="closeDialog" class="btn btn-ghost" type="button">Đóng</button>
+        <button id="randomAgain" class="btn-gradient text-white font-bold p-3 rounded-xl flex-1">🔄 Random lại</button>
+        <button id="closeDialog" class="btn-ghost p-3 rounded-xl flex-1">Đóng</button>
       </div>
     </div>
   </dialog>
