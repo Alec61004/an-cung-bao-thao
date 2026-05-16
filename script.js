@@ -32,9 +32,11 @@ function renderItems(filter = 'all') {
   filteredItems.forEach(item => {
     const card = document.createElement('div');
     card.className = 'glass-card p-5 shadow-md flex justify-between items-center hover:shadow-lg transition-all';
+    const imageUrl = getIllustrationUrl(item);
     card.innerHTML = `
       <div class="flex items-center gap-4 min-w-0">
-        <div class="text-3xl shrink-0">${getCategoryEmoji(item.category || item.type)}</div>
+        <img class="item-photo shrink-0" src="${imageUrl}" alt="Ảnh minh họa ${esc(item.name)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <div class="text-3xl shrink-0 item-fallback" style="display:none">${getCategoryEmoji(item.category || item.type)}</div>
         <div class="min-w-0">
           <h3 class="font-bold text-gray-800 text-lg">${esc(item.name)}</h3>
           ${item.link ? `<a href="${esc(item.link)}" target="_blank" rel="noopener" class="text-pink-500 text-sm break-all">${esc(item.link)}</a>` : ''}
@@ -93,6 +95,63 @@ async function removeItem(id) {
     console.error(error);
     alert('Không thể xóa món này!');
   }
+}
+
+function getIllustrationUrl(item) {
+  const keyword = buildImageKeyword(item);
+  const lock = Math.abs(hashCode(`${item.id || ''}-${item.name || ''}`)) % 1000;
+  return `https://loremflickr.com/160/160/${encodeURIComponent(keyword)}?lock=${lock}`;
+}
+
+function buildImageKeyword(item) {
+  const rawName = removeVietnameseTones(String(item.name || '').toLowerCase());
+  const category = item.category || item.type || 'food';
+
+  const known = [
+    ['banh trang', 'vietnamese rice paper snack'],
+    ['tra sua', 'bubble tea'],
+    ['milk tea', 'bubble tea'],
+    ['cafe', 'coffee shop'],
+    ['ca phe', 'coffee shop'],
+    ['coffee', 'coffee shop'],
+    ['pho', 'vietnamese pho noodle soup'],
+    ['bun bo', 'vietnamese beef noodle soup'],
+    ['bun dau', 'vietnamese food'],
+    ['com tam', 'vietnamese broken rice'],
+    ['lau', 'hot pot'],
+    ['pizza', 'pizza'],
+    ['burger', 'burger'],
+    ['sushi', 'sushi'],
+    ['kem', 'ice cream'],
+    ['banh mi', 'vietnamese sandwich'],
+  ];
+
+  const match = known.find(([key]) => rawName.includes(key));
+  if (match) return match[1];
+
+  const fallback = {
+    food: 'vietnamese food',
+    cafe: 'coffee shop',
+    play: 'fun place',
+    travel: 'romantic travel'
+  };
+  return fallback[category] || 'food';
+}
+
+function removeVietnameseTones(str) {
+  return str.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
+}
+
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
 }
 
 function getCategoryEmoji(cat) {
