@@ -251,18 +251,59 @@ document.getElementById('randomPlayBtn').addEventListener('click', () => pickRan
 document.getElementById('randomAgain').addEventListener('click', () => pickRandom(currentFilter === 'all' ? null : currentFilter));
 document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('randomDialog').close());
 
-// Background music (GitHub Pages: user must click to play)
+// Background music playlist (random one each page load)
 const bgMusic = document.getElementById('bgMusic');
 const musicToggle = document.getElementById('musicToggle');
+const nowPlaying = document.getElementById('nowPlaying');
 let musicOn = false;
+let playlist = [];
+let chosenTrack = null;
 
 function setMusicUI() {
   if (!musicToggle) return;
   musicToggle.textContent = musicOn ? '🔊 Nhạc: Bật' : '🔇 Nhạc: Tắt';
 }
 
-if (musicToggle && bgMusic) {
+function setNowPlaying(text) {
+  if (!nowPlaying) return;
+  nowPlaying.textContent = text || '';
+}
+
+function pickRandomTrack(tracks) {
+  const pool = (tracks || []).filter(t => t && t.file);
+  if (!pool.length) return null;
+  const idx = Math.floor(Math.random() * pool.length);
+  return pool[idx];
+}
+
+async function loadPlaylist() {
+  try {
+    const res = await fetch('music/playlist.json', { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data.tracks) ? data.tracks : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function initMusic() {
+  if (!bgMusic || !musicToggle) return;
+
+  playlist = await loadPlaylist();
+  chosenTrack = pickRandomTrack(playlist);
+
+  if (chosenTrack) {
+    bgMusic.src = chosenTrack.file;
+    setNowPlaying(`🎵 Hôm nay nghe: ${chosenTrack.title || chosenTrack.file}`);
+  } else {
+    // fallback: single-file mode
+    bgMusic.src = 'background.mp3';
+    setNowPlaying('🎵 Hôm nay nghe: background.mp3');
+  }
+
   setMusicUI();
+
   musicToggle.addEventListener('click', async () => {
     try {
       if (!musicOn) {
@@ -275,9 +316,10 @@ if (musicToggle && bgMusic) {
       setMusicUI();
     } catch (e) {
       console.log('Autoplay blocked until user gesture or file missing:', e);
-      alert('Không phát được nhạc. Kiểm tra file background.mp3 đã upload chưa nhé.');
+      alert('Không phát được nhạc. Kiểm tra file nhạc (music/...) đã upload đúng tên chưa nhé.');
     }
   });
 }
 
+initMusic();
 loadItems();
