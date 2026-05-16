@@ -105,7 +105,6 @@ function getIllustrationUrl(item) {
   const lock = Math.abs(hashCode(`${item.id || ''}-${item.name || ''}`)) % 1000;
   return `https://loremflickr.com/160/160/${encodeURIComponent(keyword)}?lock=${lock}`;
 }
-
 function buildImageKeyword(item) {
   const rawName = removeVietnameseTones(String(item.name || '').toLowerCase());
   const category = item.category || item.type || 'food';
@@ -194,9 +193,8 @@ function hashCode(str) {
   }
   return hash;
 }
-
 function getCategoryEmoji(cat) {
-  const emojis = { food: '🍔', cafe: '☕', play: '🎡', travel: '✈️' };
+  const emojis = { food: '🍔', cafe: '☕️', play: '🎡', travel: '✈️' };
   return emojis[cat] || '✨';
 }
 
@@ -238,7 +236,7 @@ function pickRandom(category = null) {
   if (item.link) {
     linkEl.style.display = 'block';
     linkEl.href = item.link;
-    linkEl.textContent = 'Mở link / Maps ↗';
+    linkEl.textContent = 'Mở link / Maps ↗️';
   } else {
     linkEl.style.display = 'none';
   }
@@ -259,32 +257,33 @@ let musicOn = false;
 let playlist = [];
 let chosenTrack = null;
 
-function setMusicUI() {
-  if (!musicToggle) return;
-  musicToggle.textContent = musicOn ? '🔊 Nhạc: Bật' : '🔇 Nhạc: Tắt';
-}
-
-function setNowPlaying(text) {
-  if (!nowPlaying) return;
-  nowPlaying.textContent = text || '';
-}
-
-function pickRandomTrack(tracks) {
-  const pool = (tracks || []).filter(t => t && t.file);
-  if (!pool.length) return null;
-  const idx = Math.floor(Math.random() * pool.length);
-  return pool[idx];
-}
-
 async function loadPlaylist() {
   try {
     const res = await fetch('music/playlist.json', { cache: 'no-store' });
-    if (!res.ok) return [];
+    if (!res.ok) {
+        console.error('Failed to load playlist.json:', res.status, res.statusText);
+        return [];
+    }
     const data = await res.json();
-    return Array.isArray(data.tracks) ? data.tracks : [];
+    return Array.isArray(data) ? data : [];
   } catch (e) {
+    console.error('Error loading or parsing playlist.json:', e);
     return [];
   }
+}
+
+function pickRandomTrack(tracks) {
+  const pool = (tracks || []).filter(t => typeof t === 'string' && t.length > 0);
+  if (!pool.length) return null;
+  const idx = Math.floor(Math.random() * pool.length);
+  const url = pool[idx];
+
+  // Extract a simple title from the URL for display
+  const fileName = url.split('/').pop(); // Get "3%20Strikes%20-%20Terror%20Jr.mp3"
+  const decodedFileName = decodeURIComponent(fileName); // Decode to "3 Strikes - Terror Jr.mp3"
+  const title = decodedFileName.replace(/\.mp3$/, ''); // Remove .mp3 extension
+
+  return { file: url, title: title }; // Return an object with file (URL) and extracted title
 }
 
 async function initMusic() {
@@ -293,13 +292,13 @@ async function initMusic() {
   playlist = await loadPlaylist();
   chosenTrack = pickRandomTrack(playlist);
 
-  if (chosenTrack) {
+  if (chosenTrack && chosenTrack.file) { // Check if chosenTrack and its file property exist
     bgMusic.src = chosenTrack.file;
-    setNowPlaying(`🎵 Hôm nay nghe: ${chosenTrack.title || chosenTrack.file}`);
+    setNowPlaying(`🎵 Đang nghe: ${chosenTrack.title}`);
   } else {
-    // fallback: single-file mode
-    bgMusic.src = 'background.mp3';
-    setNowPlaying('🎵 Hôm nay nghe: background.mp3');
+    console.warn('Playlist is empty or track selection failed. No background music will play.');
+    setNowPlaying('Không có nhạc để phát.');
+    musicToggle.style.display = 'none'; // Hide the toggle if no music
   }
 
   setMusicUI();
@@ -307,6 +306,10 @@ async function initMusic() {
   musicToggle.addEventListener('click', async () => {
     try {
       if (!musicOn) {
+        if (!bgMusic.src) { // If src is still empty, something went wrong
+            alert('Không có nhạc để phát. Vui lòng kiểm tra playlist.');
+            return;
+        }
         await bgMusic.play();
         musicOn = true;
       } else {
@@ -315,8 +318,12 @@ async function initMusic() {
       }
       setMusicUI();
     } catch (e) {
-      console.log('Autoplay blocked until user gesture or file missing:', e);
-      alert('Không phát được nhạc. Kiểm tra file nhạc (music/...) đã upload đúng tên chưa nhé.');
+      console.warn('Autoplay blocked or file missing/error during playback:', e);
+      if (!bgMusic.src) {
+        alert('Không có nhạc để phát. Vui lòng kiểm tra playlist và file nhạc.');
+      } else {
+        alert('Trình duyệt chặn tự động phát nhạc. Vui lòng bấm nút play/pause để bắt đầu.');
+      }
     }
   });
 }
