@@ -25,7 +25,7 @@ function renderItems(filter = 'all') {
   const filteredItems = filter === 'all' ? items : items.filter(i => (i.category || i.type) === filter);
 
   if (filteredItems.length === 0) {
-    listElement.innerHTML = `<p class="text-center text-gray-500 mt-10 italic">Chưa có gì ở đây cả. Hãy cùng nhau thêm những điều tuyệt vời nhé! ❤️</p>`;
+    listElement.innerHTML = `<p class="text-center text-gray-500 mt-10 italic"> Vợ và Chòn cùng nhau thêm vào đây những điều tuyệt vời nhé my love ❤️</p>`;
     return;
   }
 
