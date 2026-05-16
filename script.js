@@ -138,9 +138,7 @@ class CoupleWishlistApp {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
       name: document.getElementById('itemName').value.trim(),
       type: document.getElementById('itemType').value,
-      status: document.getElementById('itemStatus').value,
-      addedBy: document.getElementById('itemAddedBy').value,
-      date: document.getElementById('itemDate').value,
+      status: 'todo',
       link: document.getElementById('itemLink').value.trim(),
       note: document.getElementById('itemNote').value.trim(),
       createdAt: new Date().toISOString(),
@@ -198,15 +196,9 @@ class CoupleWishlistApp {
       <article class="wish-card ${item.status === 'done' ? 'is-done' : ''}">
         <div class="wish-top">
           <span class="type-pill ${item.type}">${type}</span>
-          <select class="status-select" onchange="app.updateStatus('${item.id}', this.value)">
-            ${this.statusOptions(item.status)}
-          </select>
+
         </div>
         <h3>${this.escapeHtml(item.name)}</h3>
-        <div class="meta-line">
-          <span>👤 ${this.escapeHtml(item.addedBy || 'Cả hai')}</span>
-          ${item.date ? `<span>📅 ${this.formatDate(item.date)}</span>` : ''}
-        </div>
         ${item.note ? `<p class="note">${this.escapeHtml(item.note)}</p>` : ''}
         <div class="card-actions">
           ${item.link ? `<a class="open-link" href="${this.escapeAttr(item.link)}" target="_blank" rel="noopener">Mở link / Maps ↗</a>` : '<span></span>'}

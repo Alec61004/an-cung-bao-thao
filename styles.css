@@ -261,7 +261,6 @@ textarea { resize: vertical; min-height: 88px; }
 .type-pill.restaurant, .type-pill.food { background: rgba(245, 158, 11, .16); color: #d97706; }
 .status-select { width: auto; padding: 7px 10px; border-radius: 999px; font-size: .86rem; }
 .wish-card h3 { margin: 14px 0 10px; font-size: 1.35rem; letter-spacing: -.02em; }
-.meta-line { justify-content: flex-start; color: var(--muted); font-size: .9rem; }
 .note {
   color: var(--muted);
   background: rgba(255, 95, 158, .08);
