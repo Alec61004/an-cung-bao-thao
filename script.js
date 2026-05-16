@@ -208,13 +208,25 @@ function esc(s) {
   }[c]));
 }
 
-function pickRandom() {
+function pickRandom(category = null) {
   if (items.length === 0) {
     alert('Chưa có món nào để random 😅');
     return;
   }
-  const pool = currentFilter === 'all' ? items : items.filter(i => (i.category || i.type) === currentFilter);
-  const source = pool.length ? pool : items;
+
+  let source = items;
+  if (category) {
+    source = items.filter(i => (i.category || i.type) === category);
+    if (!source.length) {
+      const text = category === 'food' ? 'ăn uống' : category === 'cafe' ? 'cafe/nước uống' : 'đi chơi';
+      alert(`Chưa có mục nào trong nhóm ${text} để random nha ❤️`);
+      return;
+    }
+  } else {
+    const pool = currentFilter === 'all' ? items : items.filter(i => (i.category || i.type) === currentFilter);
+    source = pool.length ? pool : items;
+  }
+
   const item = source[Math.floor(Math.random() * source.length)];
   const dialog = document.getElementById('randomDialog');
   const nameEl = document.getElementById('randomName');
@@ -230,8 +242,10 @@ function pickRandom() {
   dialog.showModal();
 }
 
-document.getElementById('randomBtn').addEventListener('click', pickRandom);
-document.getElementById('randomAgain').addEventListener('click', pickRandom);
+document.getElementById('randomEatBtn').addEventListener('click', () => pickRandom('food'));
+document.getElementById('randomCafeBtn').addEventListener('click', () => pickRandom('cafe'));
+document.getElementById('randomPlayBtn').addEventListener('click', () => pickRandom('play'));
+document.getElementById('randomAgain').addEventListener('click', () => pickRandom(currentFilter === 'all' ? null : currentFilter));
 document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('randomDialog').close());
 
 loadItems();

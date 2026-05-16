@@ -17,7 +17,11 @@
     <header class="text-center mb-10">
       <h1 class="text-4xl font-bold text-pink-600 mb-2">❤️ Điều Thầm Kín Của Vợ Thảo và Chòn Bảo  ❤️</h1>
       <p class="text-gray-600 italic">Nơi lưu giữ những khoái cảm tột đỉnh </p>
-      <button id="randomBtn" class="mt-4 px-6 py-2 bg-pink-500 text-white rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg">🎲 Random kèo</button>
+      <div class="random-group mt-4">
+        <button id="randomEatBtn" class="px-4 py-2 bg-pink-500 text-white rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg">🍽️ Random ăn uống</button>
+        <button id="randomCafeBtn" class="px-4 py-2 bg-pink-400 text-white rounded-full font-bold hover:bg-pink-500 transition-all shadow-lg">☕ Random cafe</button>
+        <button id="randomPlayBtn" class="px-4 py-2 bg-pink-300 text-white rounded-full font-bold hover:bg-pink-400 transition-all shadow-lg">🎡 Random đi chơi</button>
+      </div>
     </header>
 
     <div class="glass-card p-6 mb-8 shadow-xl">
@@ -37,8 +41,8 @@
     <div class="flex justify-center gap-2 mb-6 overflow-x-auto pb-2">
       <button onclick="filterItems('all')" class="filter-btn active">Tất cả</button>
       <button onclick="filterItems('food')" class="filter-btn">🍔 Món ăn</button>
-      <button onclick="filterItems('cafe')" class="filter-btn">☕ Cafe</button>
-      <button onclick="filterItems('play')" class="filter-btn">🎡 Vui chơi</button>
+      <button onclick="filterItems('cafe')" class="filter-btn">☕ Nước uống</button>
+      <button onclick="filterItems('play')" class="filter-btn">🎡 Đi chơi</button>
     </div>
 
     <div id="wishlist" class="grid grid-cols-1 gap-4"></div>
