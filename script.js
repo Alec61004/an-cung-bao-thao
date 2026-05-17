@@ -299,8 +299,19 @@ function pickRandom(category = null) {
   const item = source[Math.floor(Math.random() * source.length)];
   const dialog = document.getElementById('randomDialog');
   const nameEl = document.getElementById('randomName');
+  const imageEl = document.getElementById('randomImage');
   const linkEl = document.getElementById('randomLink');
+  const imageUrl = getItemImageUrl(item);
+
   nameEl.textContent = item.name;
+  if (imageEl) {
+    imageEl.src = imageUrl;
+    imageEl.alt = `Ảnh ${item.name || 'kèo hôm nay'}`;
+    imageEl.style.display = 'block';
+    imageEl.onerror = () => {
+      imageEl.style.display = 'none';
+    };
+  }
   if (item.link) {
     linkEl.style.display = 'block';
     linkEl.href = item.link;
