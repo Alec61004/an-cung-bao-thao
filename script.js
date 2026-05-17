@@ -412,9 +412,11 @@ function pickRandom(category = null) {
   const dialog = document.getElementById('randomDialog');
   const nameEl = document.getElementById('randomName');
   const imageEl = document.getElementById('randomImage');
+  const noteEl = document.getElementById('randomNote');
   const linkEl = document.getElementById('randomLink');
   const imageUrl = getItemImageUrl(item);
   const categoryEmoji = getCategoryEmoji(item.category || item.type);
+  const cleanNote = removeImageUrlFromNote(item.note);
 
   nameEl.textContent = item.name;
   const headingEl = document.getElementById('dialogHeading');
@@ -426,6 +428,14 @@ function pickRandom(category = null) {
     imageEl.onerror = () => {
       imageEl.style.display = 'none';
     };
+  }
+  if (noteEl) {
+    if (cleanNote) {
+      noteEl.textContent = `💌 ${cleanNote}`;
+      noteEl.style.display = 'block';
+    } else {
+      noteEl.style.display = 'none';
+    }
   }
   if (item.link) {
     linkEl.style.display = 'block';
