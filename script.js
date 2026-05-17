@@ -233,7 +233,10 @@ function fileToBase64Payload(file) {
 }
 
 async function uploadImageToImgBB(file) {
-  const base64 = await fileToBase64Payload(file);
+  // Dùng ảnh đã resize trước khi gửi lên Apps Script để tránh lỗi iPhone Safari "Load failed"
+  const base64 = selectedImageDataUrl
+    ? selectedImageDataUrl.split(',')[1]
+    : await fileToBase64Payload(file);
   const res = await fetch(API_URL, {
     method: 'POST',
     body: JSON.stringify({
@@ -257,14 +260,16 @@ function resizeImageToDataUrl(file) {
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
-        const maxSize = 900;
+        const maxSize = 1600;
         const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
         const canvas = document.createElement('canvas');
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
         resolve(dataUrl);
       };
       img.onerror = reject;
