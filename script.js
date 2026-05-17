@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxUvM17UahFkZgcF_FtaT760Eau4YNIw17m_chCf4ssrbvBrQYjAiX3U5B8Pk5eRlGaww/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxhMJorqBS935-rnAEh6xAAWyX7xUuwXO4FLP2_4LJ2pY_EslAnsUT2YytAzywpV6UWuA/exec';
 let items = [];
 let currentFilter = 'all';
 let selectedImageDataUrl = '';
