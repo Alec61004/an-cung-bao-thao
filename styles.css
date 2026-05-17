@@ -162,6 +162,36 @@ body::before {
 }
 .btn-ghost:hover { background: #e5e7eb; }
 
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 17px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.category-food { background: #fce4ec; }
+.category-cafe { background: #f3e5f5; }
+.category-play { background: #e3f2fd; }
+
+.random-dialog[open] .dialog-card {
+  animation: dialogScaleIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes dialogScaleIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.random-dialog::backdrop {
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .wishlist-card {
   border: 1px solid rgba(255, 255, 255, 0.7);
 }

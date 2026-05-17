@@ -43,7 +43,7 @@ function renderItems(filter = 'all') {
         <img class="item-photo shrink-0" src="${imageUrl}" alt="Ảnh minh họa ${esc(item.name)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
         <div class="text-3xl shrink-0 item-fallback" style="display:none">${getCategoryEmoji(item.category || item.type)}</div>
         <div class="min-w-0">
-          <h3 class="font-bold text-gray-800 text-lg">${esc(item.name)}</h3>
+          <h3 class="font-bold text-gray-800 text-lg"><span class="category-badge category-${item.category || item.type}">${getCategoryEmoji(item.category || item.type)}</span>${esc(item.name)}</h3>
           ${item.link ? `<a href="${esc(item.link)}" target="_blank" rel="noopener" class="text-pink-500 text-sm break-all">${esc(item.link)}</a>` : ''}
           ${item.note ? `<p class="text-gray-500 text-xs mt-1">${esc(item.note)}</p>` : ''}
         </div>
@@ -332,8 +332,11 @@ function pickRandom(category = null) {
   const imageEl = document.getElementById('randomImage');
   const linkEl = document.getElementById('randomLink');
   const imageUrl = getItemImageUrl(item);
+  const categoryEmoji = getCategoryEmoji(item.category || item.type);
 
   nameEl.textContent = item.name;
+  const headingEl = document.getElementById('dialogHeading');
+  if (headingEl) headingEl.textContent = `${categoryEmoji} Kèo hôm nay là...`;
   if (imageEl) {
     imageEl.src = imageUrl;
     imageEl.alt = `Ảnh ${item.name || 'kèo hôm nay'}`;
