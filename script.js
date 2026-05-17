@@ -36,7 +36,7 @@ function renderItems(filter = 'all') {
 
   filteredItems.forEach(item => {
     const card = document.createElement('div');
-    card.className = 'glass-card p-5 shadow-md flex justify-between items-center hover:shadow-lg transition-all';
+    card.className = 'glass-card wishlist-card p-5 shadow-md flex justify-between items-center hover:shadow-lg transition-all';
     const imageUrl = getItemImageUrl(item);
     card.innerHTML = `
       <div class="flex items-center gap-4 min-w-0">
