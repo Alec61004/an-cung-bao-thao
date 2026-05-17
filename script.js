@@ -38,6 +38,7 @@ function renderItems(filter = 'all') {
     const card = document.createElement('div');
     card.className = 'glass-card wishlist-card p-5 shadow-md flex justify-between items-center hover:shadow-lg transition-all';
     const imageUrl = getItemImageUrl(item);
+    const cleanNote = removeImageUrlFromNote(item.note);
     card.innerHTML = `
       <div class="flex items-center gap-4 min-w-0">
         <img class="item-photo shrink-0" src="${imageUrl}" alt="Ảnh minh họa ${esc(item.name)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
@@ -45,7 +46,7 @@ function renderItems(filter = 'all') {
         <div class="min-w-0">
           <h3 class="font-bold text-gray-800 text-lg"><span class="category-badge category-${item.category || item.type}">${getCategoryEmoji(item.category || item.type)}</span>${esc(item.name)}</h3>
           ${item.link ? `<a href="${esc(item.link)}" target="_blank" rel="noopener" class="text-pink-500 text-sm break-all">${esc(item.link)}</a>` : ''}
-          ${item.note ? `<p class="text-gray-500 text-xs mt-1">${esc(item.note)}</p>` : ''}
+          ${cleanNote ? `<p class="text-gray-500 text-xs mt-1">${esc(cleanNote)}</p>` : ''}
         </div>
       </div>
       <button onclick="removeItem('${item.id}')" class="text-red-400 hover:text-red-600 p-2 shrink-0">✕</button>
@@ -58,9 +59,13 @@ async function addItem() {
   const name = document.getElementById('itemName').value.trim();
   const category = document.getElementById('itemCategory').value;
   const link = document.getElementById('itemLink').value.trim();
-  const note = document.getElementById('itemNote').value.trim();
+  const noteRaw = document.getElementById('itemNote').value.trim();
+  const imageUrlInput = (document.getElementById('itemImageUrl')?.value || '').trim();
   const image = selectedImageDataUrl;
   const id = Date.now().toString();
+
+  // Nếu có link ảnh thì lưu kèm vào note để KHÔNG cần sửa Apps Script (vẫn persist qua Google Sheet)
+  const note = mergeImageUrlIntoNote(noteRaw, imageUrlInput);
 
   if (!name) {
     alert('Bạn ơi, nhập tên món ăn hoặc địa điểm đã nhé! ❤️');
@@ -85,6 +90,8 @@ async function addItem() {
     document.getElementById('itemName').value = '';
     document.getElementById('itemLink').value = '';
     document.getElementById('itemNote').value = '';
+    const imageUrlEl = document.getElementById('itemImageUrl');
+    if (imageUrlEl) imageUrlEl.value = '';
     clearSelectedImage();
     await loadItems();
   } catch (error) {
@@ -109,7 +116,28 @@ async function removeItem(id) {
 }
 
 function getItemImageUrl(item) {
-  return item.image || item.imageUrl || item.image_url || getLocalImage(item.id) || getIllustrationUrl(item);
+  // Ưu tiên link ảnh menu (persist qua Google Sheet thông qua note)
+  const noteImg = extractImageUrlFromNote(item.note);
+  return noteImg || item.image || item.imageUrl || item.image_url || getLocalImage(item.id) || getIllustrationUrl(item);
+}
+
+function mergeImageUrlIntoNote(note, imageUrl) {
+  const cleanNote = String(note || '').trim();
+  const cleanUrl = String(imageUrl || '').trim();
+  if (!cleanUrl) return cleanNote;
+
+  const withoutOld = removeImageUrlFromNote(cleanNote);
+  return `${withoutOld}${withoutOld ? '\n' : ''}[img]${cleanUrl}`;
+}
+
+function extractImageUrlFromNote(note) {
+  const text = String(note || '');
+  const m = text.match(/\[img\](https?:\/\/\S+)/i);
+  return m ? m[1] : '';
+}
+
+function removeImageUrlFromNote(note) {
+  return String(note || '').replace(/\n?\[img\]https?:\/\/\S+/ig, '').trim();
 }
 
 function saveLocalImage(id, image) {
