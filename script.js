@@ -2,6 +2,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbyOtyCH9vAPJvdJLijHvzRY
 let items = [];
 let currentFilter = 'all';
 let selectedImageDataUrl = '';
+const LOCAL_IMAGE_PREFIX = 'wishlist-image-';
 
 async function loadItems() {
   try {
@@ -59,6 +60,7 @@ async function addItem() {
   const link = document.getElementById('itemLink').value.trim();
   const note = document.getElementById('itemNote').value.trim();
   const image = selectedImageDataUrl;
+  const id = Date.now().toString();
 
   if (!name) {
     alert('Bạn ơi, nhập tên món ăn hoặc địa điểm đã nhé! ❤️');
@@ -70,7 +72,7 @@ async function addItem() {
       method: 'POST',
       body: JSON.stringify({
         action: 'add',
-        id: Date.now().toString(),
+        id,
         name,
         category,
         type: category,
@@ -79,6 +81,7 @@ async function addItem() {
         image
       })
     });
+    saveLocalImage(id, image);
     document.getElementById('itemName').value = '';
     document.getElementById('itemLink').value = '';
     document.getElementById('itemNote').value = '';
@@ -97,6 +100,7 @@ async function removeItem(id) {
       method: 'POST',
       body: JSON.stringify({ action: 'delete', id })
     });
+    removeLocalImage(id);
     await loadItems();
   } catch (error) {
     console.error(error);
@@ -105,7 +109,33 @@ async function removeItem(id) {
 }
 
 function getItemImageUrl(item) {
-  return item.image || item.imageUrl || item.image_url || getIllustrationUrl(item);
+  return item.image || item.imageUrl || item.image_url || getLocalImage(item.id) || getIllustrationUrl(item);
+}
+
+function saveLocalImage(id, image) {
+  if (!id || !image) return;
+  try {
+    localStorage.setItem(`${LOCAL_IMAGE_PREFIX}${id}`, image);
+  } catch (error) {
+    console.warn('Cannot save image locally:', error);
+    alert('Ảnh hơi nặng nên trình duyệt không lưu được lâu dài, nhưng món vẫn được thêm nha ❤️');
+  }
+}
+
+function getLocalImage(id) {
+  if (!id) return '';
+  try {
+    return localStorage.getItem(`${LOCAL_IMAGE_PREFIX}${id}`) || '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function removeLocalImage(id) {
+  if (!id) return;
+  try {
+    localStorage.removeItem(`${LOCAL_IMAGE_PREFIX}${id}`);
+  } catch (error) {}
 }
 
 function clearSelectedImage() {
