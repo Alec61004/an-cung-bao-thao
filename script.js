@@ -100,10 +100,9 @@ async function addItem() {
       })
     });
 
-    // Nếu không dùng cloud, thì lưu tạm vào localStorage để hiện trên máy này
-    if (!cloudImageUrl && selectedImageDataUrl) {
-      saveLocalImage(id, selectedImageDataUrl);
-    }
+    // Lưu cả link cloud vào localStorage để ảnh hiện ngay trên máy này,
+    // kể cả khi Apps Script chưa lưu/trả về trường note/image.
+    saveLocalImage(id, cloudImageUrl || selectedImageDataUrl);
 
     document.getElementById('itemName').value = '';
     document.getElementById('itemLink').value = '';
@@ -148,8 +147,9 @@ function mergeImageUrlIntoNote(note, imageUrl) {
 
 function extractImageUrlFromNote(note) {
   const text = String(note || '');
-  const m = text.match(/\[img\](https?:\/\/\S+)/i);
-  return m ? m[1] : '';
+  // Tìm kiếm linh hoạt hơn: bắt đầu bằng [img] và kết thúc bằng dấu đóng ngoặc hoặc hết chuỗi
+  const m = text.match(/\[img\]\s*(https?:\/\/[^\]\s]+)/i);
+  return m ? m[1].trim() : '';
 }
 
 function removeImageUrlFromNote(note) {
