@@ -4,7 +4,7 @@ let currentFilter = 'all';
 let selectedImageDataUrl = '';
 let selectedImageFile = null;
 const LOCAL_IMAGE_PREFIX = 'wishlist-image-';
-const IMGBB_KEY_STORAGE = 'wishlist-imgbb-api-key';
+
 
 async function loadItems() {
   try {
@@ -220,16 +220,6 @@ function setupImageUpload() {
   });
 }
 
-function getImgBBKey() {
-  let key = localStorage.getItem(IMGBB_KEY_STORAGE) || '';
-  if (key) return key;
-
-  key = prompt('Dán ImgBB API key miễn phí để upload ảnh rõ nét lên cloud:') || '';
-  key = key.trim();
-  if (key) localStorage.setItem(IMGBB_KEY_STORAGE, key);
-  return key;
-}
-
 function fileToBase64Payload(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -243,25 +233,22 @@ function fileToBase64Payload(file) {
 }
 
 async function uploadImageToImgBB(file) {
-  const key = getImgBBKey();
-  if (!key) throw new Error('Thiếu ImgBB API key');
-
   const base64 = await fileToBase64Payload(file);
-  const form = new FormData();
-  form.append('key', key);
-  form.append('image', base64);
-  form.append('name', `wishlist-${Date.now()}`);
-
-  const res = await fetch('https://api.imgbb.com/1/upload', {
+  const res = await fetch(API_URL, {
     method: 'POST',
-    body: form
+    body: JSON.stringify({
+      action: 'uploadImage',
+      image: base64,
+      name: `wishlist-${Date.now()}`
+    })
   });
+
   const data = await res.json();
-  if (!res.ok || !data.success) {
-    throw new Error(data?.error?.message || 'Không upload được ảnh lên ImgBB');
+  if (!res.ok || !data.success || !data.url) {
+    throw new Error(data.error || 'Không upload được ảnh lên ImgBB');
   }
 
-  return data.data.display_url || data.data.url;
+  return data.url;
 }
 
 function resizeImageToDataUrl(file) {
