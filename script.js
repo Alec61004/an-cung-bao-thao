@@ -2,7 +2,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbyOtyCH9vAPJvdJLijHvzRY
 let items = [];
 let currentFilter = 'all';
 let selectedImageDataUrl = '';
+let selectedImageFile = null;
 const LOCAL_IMAGE_PREFIX = 'wishlist-image-';
+const IMGBB_KEY_STORAGE = 'wishlist-imgbb-api-key';
 
 async function loadItems() {
   try {
@@ -38,6 +40,7 @@ function renderItems(filter = 'all') {
     const card = document.createElement('div');
     card.className = 'glass-card wishlist-card p-5 shadow-md flex justify-between items-center hover:shadow-lg transition-all';
     const imageUrl = getItemImageUrl(item);
+    const cleanNote = removeImageUrlFromNote(item.note);
     card.innerHTML = `
       <div class="flex items-center gap-4 min-w-0">
         <img class="item-photo shrink-0" src="${imageUrl}" alt="Ảnh minh họa ${esc(item.name)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
@@ -45,7 +48,7 @@ function renderItems(filter = 'all') {
         <div class="min-w-0">
           <h3 class="font-bold text-gray-800 text-lg"><span class="category-badge category-${item.category || item.type}">${getCategoryEmoji(item.category || item.type)}</span>${esc(item.name)}</h3>
           ${item.link ? `<a href="${esc(item.link)}" target="_blank" rel="noopener" class="text-pink-500 text-sm break-all">${esc(item.link)}</a>` : ''}
-          ${item.note ? `<p class="text-gray-500 text-xs mt-1">${esc(item.note)}</p>` : ''}
+          ${cleanNote ? `<p class="text-gray-500 text-xs mt-1">${esc(cleanNote)}</p>` : ''}
         </div>
       </div>
       <button onclick="removeItem('${item.id}')" class="text-red-400 hover:text-red-600 p-2 shrink-0">✕</button>
@@ -58,8 +61,8 @@ async function addItem() {
   const name = document.getElementById('itemName').value.trim();
   const category = document.getElementById('itemCategory').value;
   const link = document.getElementById('itemLink').value.trim();
-  const note = document.getElementById('itemNote').value.trim();
-  const image = selectedImageDataUrl;
+  const noteRaw = document.getElementById('itemNote').value.trim();
+  const imageUrlInput = (document.getElementById('itemImageUrl')?.value || '').trim();
   const id = Date.now().toString();
 
   if (!name) {
@@ -68,6 +71,21 @@ async function addItem() {
   }
 
   try {
+    let cloudImageUrl = imageUrlInput;
+
+    // Nếu người dùng chọn upload file từ máy
+    if (selectedImageFile) {
+      try {
+        cloudImageUrl = await uploadImageToImgBB(selectedImageFile);
+      } catch (error) {
+        alert('Lỗi upload ảnh lên cloud: ' + error.message + '. Alec sẽ lưu ảnh tạm vào máy bạn.');
+        cloudImageUrl = '';
+      }
+    }
+
+    // Lưu link ảnh vào note theo dạng [img]url để persist qua Google Sheet
+    const note = mergeImageUrlIntoNote(noteRaw, cloudImageUrl);
+
     await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({
@@ -78,13 +96,20 @@ async function addItem() {
         type: category,
         link,
         note,
-        image
+        image: cloudImageUrl || selectedImageDataUrl
       })
     });
-    saveLocalImage(id, image);
+
+    // Nếu không dùng cloud, thì lưu tạm vào localStorage để hiện trên máy này
+    if (!cloudImageUrl && selectedImageDataUrl) {
+      saveLocalImage(id, selectedImageDataUrl);
+    }
+
     document.getElementById('itemName').value = '';
     document.getElementById('itemLink').value = '';
     document.getElementById('itemNote').value = '';
+    const imageUrlEl = document.getElementById('itemImageUrl');
+    if (imageUrlEl) imageUrlEl.value = '';
     clearSelectedImage();
     await loadItems();
   } catch (error) {
@@ -109,7 +134,26 @@ async function removeItem(id) {
 }
 
 function getItemImageUrl(item) {
-  return item.image || item.imageUrl || item.image_url || getLocalImage(item.id) || getIllustrationUrl(item);
+  const noteImg = extractImageUrlFromNote(item.note);
+  return noteImg || item.image || item.imageUrl || item.image_url || getLocalImage(item.id) || getIllustrationUrl(item);
+}
+
+function mergeImageUrlIntoNote(note, imageUrl) {
+  const cleanNote = String(note || '').trim();
+  const cleanUrl = String(imageUrl || '').trim();
+  if (!cleanUrl) return cleanNote;
+  const withoutOld = removeImageUrlFromNote(cleanNote);
+  return `${withoutOld}${withoutOld ? '\n' : ''}[img]${cleanUrl}`;
+}
+
+function extractImageUrlFromNote(note) {
+  const text = String(note || '');
+  const m = text.match(/\[img\](https?:\/\/\S+)/i);
+  return m ? m[1] : '';
+}
+
+function removeImageUrlFromNote(note) {
+  return String(note || '').replace(/\n?\[img\]https?:\/\/\S+/ig, '').trim();
 }
 
 function saveLocalImage(id, image) {
@@ -140,6 +184,7 @@ function removeLocalImage(id) {
 
 function clearSelectedImage() {
   selectedImageDataUrl = '';
+  selectedImageFile = '';
   const input = document.getElementById('itemImage');
   const preview = document.getElementById('imagePreview');
   if (input) input.value = '';
@@ -163,6 +208,7 @@ function setupImageUpload() {
     }
 
     try {
+      selectedImageFile = file;
       selectedImageDataUrl = await resizeImageToDataUrl(file);
       preview.src = selectedImageDataUrl;
       preview.style.display = 'block';
@@ -172,6 +218,50 @@ function setupImageUpload() {
       clearSelectedImage();
     }
   });
+}
+
+function getImgBBKey() {
+  let key = localStorage.getItem(IMGBB_KEY_STORAGE) || '';
+  if (key) return key;
+
+  key = prompt('Dán ImgBB API key miễn phí để upload ảnh rõ nét lên cloud:') || '';
+  key = key.trim();
+  if (key) localStorage.setItem(IMGBB_KEY_STORAGE, key);
+  return key;
+}
+
+function fileToBase64Payload(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      resolve(result.split(',')[1] || result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadImageToImgBB(file) {
+  const key = getImgBBKey();
+  if (!key) throw new Error('Thiếu ImgBB API key');
+
+  const base64 = await fileToBase64Payload(file);
+  const form = new FormData();
+  form.append('key', key);
+  form.append('image', base64);
+  form.append('name', `wishlist-${Date.now()}`);
+
+  const res = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: form
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data?.error?.message || 'Không upload được ảnh lên ImgBB');
+  }
+
+  return data.data.display_url || data.data.url;
 }
 
 function resizeImageToDataUrl(file) {
