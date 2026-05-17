@@ -63,12 +63,12 @@ body::before {
 }
 
 .item-photo {
-  width: 58px;
-  height: 58px;
-  border-radius: 16px;
+  width: 74px;
+  height: 74px;
+  border-radius: 18px;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.72);
-  box-shadow: 0 8px 20px rgba(219, 39, 119, 0.16);
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 10px 24px rgba(219, 39, 119, 0.18);
   background: rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
   display: flex;
@@ -140,11 +140,15 @@ body::before {
   color: #db2777;
 }
 .dialog-link {
-  display: block;
-  margin-bottom: 20px;
-  color: #f687b3;
-  font-weight: 600;
+  display: inline-block;
+  margin: 10px 0 20px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #f687b3, #ed64a6);
+  color: #fff;
+  font-weight: 700;
   text-decoration: none;
+  box-shadow: 0 8px 20px rgba(237, 100, 166, 0.3);
 }
 .dialog-actions {
   display: flex;
