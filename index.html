@@ -35,6 +35,11 @@
           <option value="play">🎡 Địa điểm vui chơi</option>
         </select>
         <input type="text" id="itemLink" placeholder="Link Maps/Facebook..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
+        <label class="image-upload-field p-3 rounded-xl ring-2 ring-pink-200 md:col-span-2">
+          <span>📷 Thêm ảnh món/quán/địa điểm</span>
+          <input type="file" id="itemImage" accept="image/*" class="hidden">
+        </label>
+        <img id="imagePreview" class="image-preview md:col-span-2" alt="Ảnh xem trước">
         <input type="text" id="itemNote" placeholder="Ghi chú..." class="p-3 rounded-xl border-none ring-2 ring-pink-200 focus:ring-pink-400 outline-none transition-all md:col-span-2">
         <button onclick="addItem()" class="btn-gradient text-white font-bold p-3 rounded-xl md:col-span-2 uppercase tracking-wider">Thêm vào danh sách ✨</button>
       </div>

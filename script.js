@@ -1,6 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbyOtyCH9vAPJvdJLijHvzRYgjmF70X9ZLkmBrbBx_FN2QMDGH7iKD-osYGCHfqmeOmJ3A/exec';
 let items = [];
 let currentFilter = 'all';
+let selectedImageDataUrl = '';
 
 async function loadItems() {
   try {
@@ -35,7 +36,7 @@ function renderItems(filter = 'all') {
   filteredItems.forEach(item => {
     const card = document.createElement('div');
     card.className = 'glass-card p-5 shadow-md flex justify-between items-center hover:shadow-lg transition-all';
-    const imageUrl = getIllustrationUrl(item);
+    const imageUrl = getItemImageUrl(item);
     card.innerHTML = `
       <div class="flex items-center gap-4 min-w-0">
         <img class="item-photo shrink-0" src="${imageUrl}" alt="Ảnh minh họa ${esc(item.name)}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
@@ -57,6 +58,7 @@ async function addItem() {
   const category = document.getElementById('itemCategory').value;
   const link = document.getElementById('itemLink').value.trim();
   const note = document.getElementById('itemNote').value.trim();
+  const image = selectedImageDataUrl;
 
   if (!name) {
     alert('Bạn ơi, nhập tên món ăn hoặc địa điểm đã nhé! ❤️');
@@ -73,12 +75,14 @@ async function addItem() {
         category,
         type: category,
         link,
-        note
+        note,
+        image
       })
     });
     document.getElementById('itemName').value = '';
     document.getElementById('itemLink').value = '';
     document.getElementById('itemNote').value = '';
+    clearSelectedImage();
     await loadItems();
   } catch (error) {
     console.error(error);
@@ -98,6 +102,71 @@ async function removeItem(id) {
     console.error(error);
     alert('Không thể xóa món này!');
   }
+}
+
+function getItemImageUrl(item) {
+  return item.image || item.imageUrl || item.image_url || getIllustrationUrl(item);
+}
+
+function clearSelectedImage() {
+  selectedImageDataUrl = '';
+  const input = document.getElementById('itemImage');
+  const preview = document.getElementById('imagePreview');
+  if (input) input.value = '';
+  if (preview) {
+    preview.removeAttribute('src');
+    preview.style.display = 'none';
+  }
+}
+
+function setupImageUpload() {
+  const input = document.getElementById('itemImage');
+  const preview = document.getElementById('imagePreview');
+  if (!input || !preview) return;
+
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0];
+    if (!file) return clearSelectedImage();
+    if (!file.type.startsWith('image/')) {
+      alert('Bạn chọn đúng file ảnh giúp Alec nha ❤️');
+      return clearSelectedImage();
+    }
+
+    try {
+      selectedImageDataUrl = await resizeImageToDataUrl(file);
+      preview.src = selectedImageDataUrl;
+      preview.style.display = 'block';
+    } catch (error) {
+      console.error(error);
+      alert('Ảnh này hơi lớn hoặc không đọc được, bạn thử ảnh khác nhé!');
+      clearSelectedImage();
+    }
+  });
+}
+
+function resizeImageToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSize = 420;
+        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        if (dataUrl.length > 45000) reject(new Error('Image is too large for Google Sheets cell'));
+        else resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function getIllustrationUrl(item) {
@@ -332,5 +401,6 @@ async function initMusic() {
   document.addEventListener('scroll', autoPlayOnce);
 }
 
+setupImageUpload();
 initMusic();
 loadItems();
