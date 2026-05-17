@@ -150,16 +150,15 @@ function resizeImageToDataUrl(file) {
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
-        const maxSize = 420;
+        const maxSize = 300;
         const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
         const canvas = document.createElement('canvas');
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        if (dataUrl.length > 45000) reject(new Error('Image is too large for Google Sheets cell'));
-        else resolve(dataUrl);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        resolve(dataUrl);
       };
       img.onerror = reject;
       img.src = reader.result;
