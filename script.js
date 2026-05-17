@@ -180,8 +180,36 @@ function clearSelectedImage() {
 function setupImageUpload() {
   const input = document.getElementById('itemImage');
   const preview = document.getElementById('imagePreview');
-  if (!input || !preview) return;
+  const urlInput = document.getElementById('itemImageUrl');
+  if (!preview) return;
 
+  // 1) Nếu người dùng dán link ảnh: tự preview (không tải về lưu trong máy)
+  if (urlInput) {
+    const onUrlChange = () => {
+      const raw = (urlInput.value || '').trim();
+      if (!raw) {
+        if (!selectedImageDataUrl) {
+          preview.removeAttribute('src');
+          preview.style.display = 'none';
+        }
+        return;
+      }
+
+      const url = normalizeImageUrl(raw);
+      preview.src = url;
+      preview.style.display = 'block';
+      preview.onerror = () => {
+        // Link không phải direct image hoặc bị chặn hotlink
+        preview.style.display = 'none';
+      };
+    };
+
+    urlInput.addEventListener('change', onUrlChange);
+    urlInput.addEventListener('input', onUrlChange);
+  }
+
+  // 2) Nếu chọn ảnh từ máy: nén rồi preview
+  if (!input) return;
   input.addEventListener('change', async () => {
     const file = input.files && input.files[0];
     if (!file) return clearSelectedImage();
@@ -200,6 +228,19 @@ function setupImageUpload() {
       clearSelectedImage();
     }
   });
+}
+
+function normalizeImageUrl(raw) {
+  let url = String(raw || '').trim();
+
+  // Google Drive share link -> direct view link (thường xem được như ảnh)
+  // Ví dụ: https://drive.google.com/file/d/<ID>/view?usp=sharing
+  const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/i);
+  if (m && m[1]) {
+    url = `https://drive.google.com/uc?export=view&id=${m[1]}`;
+  }
+
+  return url;
 }
 
 function resizeImageToDataUrl(file) {
